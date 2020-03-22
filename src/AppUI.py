@@ -52,6 +52,7 @@ class AppUI(tk.Frame):
         self.primary_color="white"
         self.secondary_color="orange red"
         self.terciary_color="royalblue1"
+        self.screen_active = True
         self.files = []
         self.checkboxes = []
         self.pages = len(features)
@@ -75,12 +76,27 @@ class AppUI(tk.Frame):
         self.is_running = True
         while self.is_running:
             self.update_progress_from_memory()
+            self.update_screen_from_memory()
             self.master.update_idletasks()
             self.master.update()
 
+    # checks shared memory and updates screen from there
+    def update_screen_from_memory(self):
+        
+        buffer = self.shm.buf
+        if self.screen_active != buffer[80]:
+            self.change_screen_status(buffer[80])
+
+    def change_screen_status(self, status):
+        self.screen_active = status
+        if(status):
+            self.enable_screen()
+        else:
+            self.disable_screen()
+
     # checks shared memory and updates progress from there
     def update_progress_from_memory(self):
-        buffer = self.smh.buf
+        buffer = self.shm.buf
         process = bytes(buffer[1:79]).decode('utf-8').rstrip('\x00')
 
         if self.current_progress != buffer[0]:
@@ -93,7 +109,9 @@ class AppUI(tk.Frame):
     def create_shared_memory(self):
         # 0 - Progress from 0 - 100
         # 1~79 - Process String
-        self.smh = shared_memory.SharedMemory(name="APPUI_WINDOW", create=True, size=80)
+        # 80 - 0: Screen Inactive / 1: Screen Active
+        self.shm = shared_memory.SharedMemory(name="APPUI_WINDOW", create=True, size=81)
+        self.shm.buf[80] = 1 # Screen active
 
     # Configures the main window
     def configure_master(self, title):
