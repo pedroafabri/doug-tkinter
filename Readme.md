@@ -81,6 +81,8 @@ Updates the current process shown above the progress bar.
 ##
 
 #### reset_progress()
+Clears the process text and zeroes the progressbar.
+##
 
 #### is_test_selected()
 Returns **"True"** if any test is selected of **"False"** otherwise.
