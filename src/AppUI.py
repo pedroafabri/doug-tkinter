@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk,Image
 from tkinter.messagebox import showinfo
+import pathlib
 
 # Scrollable frame class
 class ScrollableFrame(tk.Frame):
@@ -40,7 +41,7 @@ class AppUI(tk.Frame):
         return AppUI.__instance
 
     # Constructor
-    def __init__(self, title, features, logo="logo.png", logo_width=300, logo_height=181):
+    def __init__(self, title, features, logo=str(pathlib.Path(__file__).parent.absolute())+"/logo.png", logo_width=300, logo_height=181):
 
         if AppUI.__instance != None:
             raise Exception("This class is a singleton and has already been instanciated. Use method 'get_instance()' instead.")

@@ -33,7 +33,7 @@ def results_button(app):
 if __name__ == '__main__':
 
     test_dict = get_tests() # Creates the dictionary
-    app = AppUI("Testing Tests", test_dict) # Instantiate AppUI passing the title and tests dictionary
+    app = AppUI("Testing Tests", test_dict, logo="./logo.png") # Instantiate AppUI passing the title and tests dictionary
     app.set_confirm_command(lambda : confirm_button(app)) # Define what the confirm button will make
     app.set_results_command(lambda : results_button(app))
     # Singleton example
