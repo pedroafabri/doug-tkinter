@@ -27,7 +27,18 @@
 
 - **logo_height**: The logo height. (Default: 181px)
 
-  
+### Updating progress from another process
+You need to use the shared_memory block called "APPUI_WINDOW" for this.
+Simply do:
+```python
+	from multiprocessing import shared_memory
+
+	smh = shared_memory.SharedMemory(name="APPUI_WINDOW")
+	buffer = smh.buf
+	buffer[0] = 0 # Current progress from 0 to 100
+```
+
+
 ### Methods
 
 ##

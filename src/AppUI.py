@@ -3,6 +3,7 @@ from tkinter import ttk
 from PIL import ImageTk,Image
 from tkinter.messagebox import showinfo
 import pathlib
+from multiprocessing import shared_memory
 
 # Scrollable frame class
 class ScrollableFrame(tk.Frame):
@@ -55,6 +56,7 @@ class AppUI(tk.Frame):
         self.checkboxes = []
         self.pages = len(features)
         self.current_page = 0
+        self.current_progress = 0
         self.features = features
         self.configure_master(title)
         self.create_logo(logo, logo_width, logo_height)
@@ -65,10 +67,26 @@ class AppUI(tk.Frame):
         self.update_pages()
         self.create_progress_bar()
         self.center_window()
+        self.create_shared_memory()
 
     # starts mainloop
     def show(self):
-        self.master.mainloop()
+        self.is_running = True
+        while self.is_running:
+            self.update_progress_from_memory()
+            self.master.update_idletasks()
+            self.master.update()
+
+    # checks shared memory and updates progress from there
+    def update_progress_from_memory(self):
+        buffer = self.smh.buf
+        if self.current_progress != buffer[0]:
+            self.update_progress(buffer[0])
+
+
+    # create the shared memory block
+    def create_shared_memory(self):
+        self.smh = shared_memory.SharedMemory(name="APPUI_WINDOW", create=True, size=1)
 
     # Configures the main window
     def configure_master(self, title):
@@ -80,7 +98,7 @@ class AppUI(tk.Frame):
         title_bar = tk.Frame(self.master, bg=self.secondary_color, relief='raised', bd=2,highlightthickness=0)
         
         # put a close button on the title bar
-        self.cross_button = tk.Button(title_bar, text='X', command=self.master.destroy, bg=self.secondary_color,padx=2,pady=2,activebackground='red',bd=0,font="bold",fg='white',highlightthickness=0)
+        self.cross_button = tk.Button(title_bar, text='X', command=self.destroy, bg=self.secondary_color,padx=2,pady=2,activebackground='red',bd=0,font="bold",fg='white',highlightthickness=0)
 
         # minimize button
         self.minimize_button = tk.Button(title_bar, text='—', command=self.minimize, bg=self.secondary_color,padx=2,pady=2,activebackground='red',bd=0,font="bold",fg='white',highlightthickness=0)
@@ -104,6 +122,11 @@ class AppUI(tk.Frame):
         self.minimize_button.bind('<Enter>', lambda x:self.change_on_hovering(self.minimize_button))
         self.minimize_button.bind('<Leave>', lambda x:self.return_to_normalstate(self.minimize_button))
         self.master.bind('<Map>', self.window_activated)
+
+    # Implementation of destroy
+    def destroy(self):
+        self.is_running = False
+        self.master.destroy()
 
     # get mouse position
     def get_pos(self, event):
@@ -303,7 +326,8 @@ class AppUI(tk.Frame):
 
     # Updates progress bar
     def update_progress(self, value):
-        self.progress.set(value)
+        self.current_progress = value
+        self.progress.set(self.current_progress)
         self.master.update()
 
     # Update the process name
