@@ -37,6 +37,7 @@ Simply do:
 	buffer = smh.buf
 	buffer[0] = 0 # Current progress from 0 to 100
 	buffer[1:79] = b'sup boooy' # Process string (max 79 characters)
+	buffer[80] = 0 # 1 - Screen Active, 0 - Screen Inactive
 ```
 
 
