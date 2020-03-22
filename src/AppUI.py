@@ -57,6 +57,7 @@ class AppUI(tk.Frame):
         self.pages = len(features)
         self.current_page = 0
         self.current_progress = 0
+        self.current_process = ""
         self.features = features
         self.configure_master(title)
         self.create_logo(logo, logo_width, logo_height)
@@ -80,13 +81,19 @@ class AppUI(tk.Frame):
     # checks shared memory and updates progress from there
     def update_progress_from_memory(self):
         buffer = self.smh.buf
+        process = bytes(buffer[1:79]).decode('utf-8').rstrip('\x00')
+
         if self.current_progress != buffer[0]:
             self.update_progress(buffer[0])
 
+        if self.current_process != process:
+            self.update_process(process)
 
     # create the shared memory block
     def create_shared_memory(self):
-        self.smh = shared_memory.SharedMemory(name="APPUI_WINDOW", create=True, size=1)
+        # 0 - Progress from 0 - 100
+        # 1~79 - Process String
+        self.smh = shared_memory.SharedMemory(name="APPUI_WINDOW", create=True, size=80)
 
     # Configures the main window
     def configure_master(self, title):
@@ -315,7 +322,7 @@ class AppUI(tk.Frame):
                                 ("LabeledProgressbar.label",
                                 {'side': 'left', "sticky": ""})],
                 'sticky': 'nswe'})])
-        self.style.configure("LabeledProgressbar", foreground="black", background=self.secondary_color)
+        self.style.configure("LabeledProgressbar", foreground="black", background=self.secondary_color, font=('wasy10', 6))
         progress_container = tk.Frame(self.master, bg=self.primary_color)
         self.progress = tk.DoubleVar()
         progress_bar = ttk.Progressbar(progress_container, variable=self.progress, maximum=100, style="LabeledProgressbar")
@@ -332,7 +339,8 @@ class AppUI(tk.Frame):
 
     # Update the process name
     def update_process(self, process):
-        self.style.configure("LabeledProgressbar", text=process)
+        self.current_process = process
+        self.style.configure("LabeledProgressbar", text=self.current_process)
 
     # Check if any test is selcted
     def is_test_selected(self):

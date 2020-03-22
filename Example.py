@@ -39,5 +39,5 @@ if __name__ == '__main__':
     # Singleton example
     app2 = AppUI.get_instance()
     print(app == app2) # True because it's the same instance
-
+    app.update_process('A' * 79)
     app.show() # Run Application

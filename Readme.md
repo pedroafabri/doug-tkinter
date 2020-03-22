@@ -36,6 +36,7 @@ Simply do:
 	smh = shared_memory.SharedMemory(name="APPUI_WINDOW")
 	buffer = smh.buf
 	buffer[0] = 0 # Current progress from 0 to 100
+	buffer[1:79] = b'sup boooy' # Process string (max 79 characters)
 ```
 
 
