@@ -36,4 +36,8 @@ if __name__ == '__main__':
     app = AppUI("Testing Tests", test_dict) # Instantiate AppUI passing the title and tests dictionary
     app.set_confirm_command(lambda : confirm_button(app)) # Define what the confirm button will make
     app.set_results_command(lambda : results_button(app))
+    # Singleton example
+    app2 = AppUI.get_instance()
+    print(app == app2) # True because it's the same instance
+
     app.show() # Run Application

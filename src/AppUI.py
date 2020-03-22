@@ -28,11 +28,24 @@ class ScrollableFrame(tk.Frame):
         scrollbar.pack(side="right", fill="y")
         
 
-# AppUI
+# AppUI class - Singleton
 class AppUI(tk.Frame):
+    
+    __instance = None
+
+    @staticmethod
+    def get_instance():
+        if AppUI.__instance == None:
+            raise Exception("Class not instanciated yet.")
+        return AppUI.__instance
 
     # Constructor
     def __init__(self, title, features, logo="logo.png", logo_width=300, logo_height=181):
+
+        if AppUI.__instance != None:
+            raise Exception("This class is a singleton and has already been instanciated. Use method 'get_instance()' instead.")
+        
+        AppUI.__instance = self # Creates the singleton
         self.master = tk.Tk()
         self.primary_color="white"
         self.secondary_color="orange red"
